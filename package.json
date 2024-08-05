@@ -9,16 +9,31 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@fullcalendar/core": "^6.1.14",
+    "@fullcalendar/daygrid": "^6.1.14",
+    "@fullcalendar/interaction": "^6.1.14",
+    "@fullcalendar/list": "^6.1.14",
+    "@fullcalendar/luxon3": "^6.1.14",
+    "@fullcalendar/react": "^6.1.14",
+    "@fullcalendar/timegrid": "^6.1.14",
+    "@mui/material": "^5.16.6",
+    "@types/luxon": "^3.4.2",
+    "luxon": "^3.4.4",
+    "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.4"
+    "react-select": "^5.8.0",
+    "sass": "^1.77.6"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "14.2.4"
-  }
+    "eslint-config-next": "14.2.4",
+    "typescript": "^5"
+  },
+  "packageManager": "yarn@1.22.22"
 }

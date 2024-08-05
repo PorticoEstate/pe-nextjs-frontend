@@ -1,0 +1,59 @@
+.resourceToggleContainer {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  width: 200px;
+}
+
+.toggleAllContainer {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 1;
+}
+
+.toggleAllButton {
+  width: 100%;
+  padding: 5px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #e0e0e0;
+  }
+}
+
+.resourceItem {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.resourceCheckbox {
+  margin-right: 10px;
+}
+
+.resourceLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex-grow: 1;
+}
+
+.resourceColorIndicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-left: 10px;
+}

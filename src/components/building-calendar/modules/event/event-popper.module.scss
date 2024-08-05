@@ -1,0 +1,25 @@
+
+.eventPopper {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 16px;
+  max-width: 300px;
+}
+
+.eventPopperHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.eventPopperContent {
+  margin-bottom: 16px;
+}
+
+.eventPopperActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
