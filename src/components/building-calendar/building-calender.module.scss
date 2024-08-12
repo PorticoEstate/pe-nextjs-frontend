@@ -28,9 +28,13 @@
 
 .calendar {
   display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto 1fr;
-  gap: 0.875rem
+  grid-template-columns: 300px 1fr;
+  grid-template-rows: auto auto 1fr;
+  gap: 0.875rem;
+  transition: 300ms;
+  &.closed {
+    grid-template-columns: 0px 1fr
+  }
 }
 
 .event {

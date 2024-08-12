@@ -2,10 +2,11 @@
 'use client'
 
 import React, {useState, useCallback} from 'react';
-import {DateTime} from "luxon";
+import {DateTime, Interval} from "luxon";
 import BuildingCalendar from "@/components/building-calendar/building-calendar";
 import {fetchBuildingSchedule, fetchFreeTimeSlots} from "@/service/api/api-utils";
 import {IBuildingResource, IEvent, Season} from "@/service/pecalendar.types";
+import {DatesSetArg} from "@fullcalendar/core";
 
 interface CalendarWrapperProps {
     initialSchedule: IEvent[];
@@ -26,14 +27,26 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
     const [freeTime, setFreeTime] = useState(initialFreeTime);
     const [isLoading, setIsLoading] = useState(false);
 
-    const fetchData = useCallback(async (date: DateTime) => {
+
+    const fetchData = useCallback(async (start: DateTime, end?: DateTime) => {
         setIsLoading(true);
         try {
-            const firstDay = date.startOf('week');
-            const weeksToFetch = [
-                firstDay.toFormat("y-MM-dd"),
-                firstDay.plus({week: 1}).toFormat("y-MM-dd"),
-            ];
+            const firstDay = start.startOf('week');
+            const lastDay = (end || DateTime.now()).endOf('week');
+
+            // Create an interval from start to end
+            const dateInterval = Interval.fromDateTimes(firstDay, lastDay);
+
+            // Generate an array of week start dates
+            const weeksToFetch = dateInterval.splitBy({ weeks: 1 }).map(interval =>
+                interval.start!.toFormat("y-MM-dd")
+            );
+
+            // If the array is empty (which shouldn't happen, but just in case),
+            // add the start date
+            if (weeksToFetch.length === 0) {
+                weeksToFetch.push(firstDay.toFormat("y-MM-dd"));
+            }
 
             const [newSchedule, newFreeTime] = await Promise.all([
                 fetchBuildingSchedule(buildingId, weeksToFetch),
@@ -50,9 +63,8 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
         }
     }, [buildingId]);
 
-    const handleDateChange = (newDate: Date) => {
-        console.log("New date", newDate)
-        fetchData(DateTime.fromJSDate(newDate));
+    const handleDateChange = (newDate: DatesSetArg) => {
+        fetchData(DateTime.fromJSDate(newDate.start), DateTime.fromJSDate(newDate.end));
     };
 
     return (

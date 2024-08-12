@@ -27,7 +27,7 @@ const EventContent = (eventInfo: EventContentArg) => {
                         <span-reverse
                             key={index}
                             style={{...circleStyle, backgroundColor: color}}
-                            title={eventInfo.event.extendedProps.resources.split(', ')[index]}
+                            title={eventInfo.event.title || eventInfo.event.extendedProps.resources.split(', ')[index]}
                         />
                     ))}
                 </div>
