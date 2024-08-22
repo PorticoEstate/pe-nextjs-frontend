@@ -3,6 +3,8 @@ import {phpGWLink} from "@/service/util";
 import axios from "axios";
 
 
+export type PopperInfoType = FilteredEventInfo;
+
 interface OrgInfo {
     customer_organization_id?: number;
     customer_organization_name?: string;

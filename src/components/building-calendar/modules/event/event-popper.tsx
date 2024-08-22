@@ -7,16 +7,17 @@ import {formatEventTime, LuxDate} from "@/service/util";
 import {FCallEvent} from "@/components/building-calendar/building-calendar.types";
 import {faClock} from "@fortawesome/free-regular-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faLayerGroup, faUser} from "@fortawesome/free-solid-svg-icons";
-import {FilteredEventInfo} from "@/service/api/event-info";
+import {faLayerGroup, faUser, faUsers} from "@fortawesome/free-solid-svg-icons";
+import {PopperInfoType} from "@/service/api/event-info";
 import ColourCircle from "@/components/building-calendar/modules/colour-circle/colour-circle";
+import {Button} from "@digdir/designsystemet-react";
 
 interface EventPopperProps {
     event: FCallEvent | null;
     anchor: HTMLElement | null;
     placement: Placement
     onClose: () => void;
-    popperInfo?: FilteredEventInfo
+    popperInfo?: PopperInfoType
 }
 
 const EventPopper: FC<EventPopperProps> = ({event, anchor, onClose, placement, popperInfo}) => {
@@ -28,7 +29,6 @@ const EventPopper: FC<EventPopperProps> = ({event, anchor, onClose, placement, p
     const userCanEdit = () => {
         return popperInfo?.info_user_can_delete_bookings || popperInfo?.info_user_can_delete_events || popperInfo?.user_can_delete_allocations;
     };
-    console.log(popperInfo, event)
     return (
         <ClickAwayListener onClickAway={onClose}>
             <Popper open={Boolean(event)} anchorEl={anchor}
@@ -61,7 +61,8 @@ const EventPopper: FC<EventPopperProps> = ({event, anchor, onClose, placement, p
                         </div>
                         {(popperInfo?.info_participant_limit || 0) > 0 && (
                             <p className={styles.participantLimit}>
-                                <span className={styles.iconParticipants} /> Maximum number of participants
+                                <FontAwesomeIcon className={'text-small'}
+                                                 icon={faUsers}/> Max {popperInfo?.info_participant_limit} participants
                             </p>
                         )}
                     </div>
@@ -78,7 +79,7 @@ const EventPopper: FC<EventPopperProps> = ({event, anchor, onClose, placement, p
                         )}
                     </div>
                     <div className={styles.eventPopperFooter}>
-                        <button onClick={onClose} className={styles.closeButton}>Ok</button>
+                        <Button onClick={onClose} variant="tertiary" className={'default'} size={'sm'}>Ok</Button>
                     </div>
                 </div>
             </Popper>

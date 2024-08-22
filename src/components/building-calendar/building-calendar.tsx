@@ -204,13 +204,25 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
 
     const tempEventArr = useMemo(() => Object.values(tempEvents), [tempEvents])
 
+    const popperPlacement = useMemo(() => {
+        switch (calendarRef.current?.calendar.currentData.viewSpec.type) {
+            case 'timeGridDay':
+                return 'auto';
+            case 'listWeek':
+                return 'bottom-start';
+            default:
+                return 'right-start';
+        }
+
+    }, [calendarRef.current?.calendar.currentData.viewSpec])
+
     useEffect(() => {
         if (!colours || !resourceToIds) {
             return;
         }
         const filteredEvents = events
             .map((e) => FCallEventConverter(e, colours, resourceToIds, enabledResources)!)
-        // .filter((e): e is EventInput => e !== null);
+        .filter(e => e);
         setCalendarEvents(filteredEvents);
     }, [events, colours, resourceToIds, enabledResources]);
 
@@ -329,7 +341,9 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
                 <EventPopper
                     popperInfo={eventInfos?.data?.[selectedEvent?.extendedProps.source.type]?.[selectedEvent?.id]}
                     event={selectedEvent}
-                    placement={['timeGridDay', 'listWeek'].includes(calendarRef.current?.calendar.currentData.viewSpec.type) ? 'bottom-start' : "right-start"}
+                    placement={
+                        popperPlacement
+                    }
                     anchor={popperAnchorEl} onClose={() => {
                     setSelectedEvent(null);
                     setPopperAnchorEl(null);

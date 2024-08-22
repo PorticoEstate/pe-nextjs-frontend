@@ -9,7 +9,7 @@
 
 .ds-btn {
   &--tertiary, &--secondary {
-    &:not(:hover):not(:active) {
+    &:not(:hover):not(:active):not(.default) {
       background-color: $white;
     }
   }

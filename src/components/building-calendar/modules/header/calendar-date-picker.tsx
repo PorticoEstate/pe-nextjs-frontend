@@ -62,6 +62,7 @@ const CalendarDatePicker: FC<CalendarDatePickerProps> = (props) => {
                 </div>
 
             )}
+            todayButton="Today"
             showMonthYearPicker={view === 'dayGridMonth'}
             showWeekNumbers={true}
             showWeekPicker={view === 'timeGridWeek' || view === 'listWeek'}
