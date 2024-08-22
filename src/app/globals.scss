@@ -1,5 +1,23 @@
 @import "../components/building-calendar/building-calender.global";
 @import "../styles/colors";
+@import "../styles/typography";
+
+:root {
+  background-color: $grey-light-64;
+}
+
+
+.ds-btn {
+  &--tertiary, &--secondary {
+    &:not(:hover):not(:active) {
+      background-color: $white;
+    }
+  }
+}
+
+.fc-event-main {
+  display: flex;
+}
 
 
 /*:root {*/

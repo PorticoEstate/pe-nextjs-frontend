@@ -1,9 +1,10 @@
+@import "../../../../styles/colors";
 
 .eventPopper {
-  background-color: white;
+  background-color: $grey-24;
   border: 1px solid #ccc;
   border-radius: 4px;
-  padding: 16px;
+  padding: 1.5rem;
   max-width: 300px;
 }
 
@@ -16,10 +17,33 @@
 
 .eventPopperContent {
   margin-bottom: 16px;
+
+  .resourcesList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    .resourceItem {
+      width: max-content;
+      padding: 0.25rem 0.75rem;
+      border-radius: 5rem;
+      border: 1px solid $black-80;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+  }
+
 }
 
 .eventPopperActions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+
+.time {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
 }

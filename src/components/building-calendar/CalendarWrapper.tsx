@@ -1,12 +1,13 @@
 // File: components/CalendarWrapper.tsx
 'use client'
 
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useRef} from 'react';
 import {DateTime, Interval} from "luxon";
 import BuildingCalendar from "@/components/building-calendar/building-calendar";
 import {fetchBuildingSchedule, fetchFreeTimeSlots} from "@/service/api/api-utils";
 import {IBuildingResource, IEvent, Season} from "@/service/pecalendar.types";
 import {DatesSetArg} from "@fullcalendar/core";
+import {Modal, Spinner} from '@digdir/designsystemet-react'
 
 interface CalendarWrapperProps {
     initialSchedule: IEvent[];
@@ -23,10 +24,20 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
                                                              resources,
                                                              seasons
                                                          }) => {
-    const [schedule, setSchedule] = useState<IEvent[]>(initialSchedule);
     const [freeTime, setFreeTime] = useState(initialFreeTime);
     const [isLoading, setIsLoading] = useState(false);
+    const modalRef = useRef<HTMLDialogElement>(null);
 
+    const prioritizeEvents = useCallback((events: IEvent[]): IEvent[] => {
+        const allocationIds = events
+            .filter(event => event.type === 'allocation')
+            .map(event => event.id);
+
+        return events.filter(event =>
+            !allocationIds.includes(event.allocation_id || -1)
+        );
+    }, []);
+    const [schedule, setSchedule] = useState<IEvent[]>(prioritizeEvents(initialSchedule));
 
     const fetchData = useCallback(async (start: DateTime, end?: DateTime) => {
         setIsLoading(true);
@@ -38,7 +49,7 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
             const dateInterval = Interval.fromDateTimes(firstDay, lastDay);
 
             // Generate an array of week start dates
-            const weeksToFetch = dateInterval.splitBy({ weeks: 1 }).map(interval =>
+            const weeksToFetch = dateInterval.splitBy({weeks: 1}).map(interval =>
                 interval.start!.toFormat("y-MM-dd")
             );
 
@@ -53,8 +64,9 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
                 fetchFreeTimeSlots(buildingId)
             ]);
 
-            setSchedule(newSchedule.schedule || []);
+            setSchedule(prioritizeEvents(newSchedule.schedule || []));
             setFreeTime(newFreeTime);
+
         } catch (error) {
             console.error('Error fetching data:', error);
             // Handle error (e.g., show error message to user)
@@ -63,13 +75,36 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
         }
     }, [buildingId]);
 
-    const handleDateChange = (newDate: DatesSetArg) => {
-        fetchData(DateTime.fromJSDate(newDate.start), DateTime.fromJSDate(newDate.end));
-    };
 
+
+
+
+
+
+
+    const handleDateChange = (newDate: DatesSetArg) => {
+        fetchData(DateTime.fromJSDate(newDate.start), DateTime.fromJSDate(newDate.end))
+            // .then(([newSchedule, newFreeTime]) => {
+            //     setSchedule(prioritizeEvents(newSchedule.schedule || []));
+            //     setFreeTime(newFreeTime);
+            // });
+    };
     return (
         <div>
-            {isLoading && <div>Loading...</div>}
+            {isLoading &&
+                <div style={{
+                    position: 'absolute',
+                    zIndex: 103,
+                    backgroundColor: 'white',
+                    borderRadius: '50%',
+                    border: 'white 5px solid',
+                    opacity: '75%',
+                    top: 5,
+                    right: 5
+                }}>
+                    <Spinner title='Henter kaffi' variant='default' size='sm'/>
+                </div>
+            }
             <BuildingCalendar
                 events={schedule}
                 onDateChange={handleDateChange}

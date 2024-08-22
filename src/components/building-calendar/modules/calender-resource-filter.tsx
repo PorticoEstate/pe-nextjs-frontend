@@ -1,5 +1,6 @@
 import React, {FC} from 'react';
 import styles from './calender-resource-filter.module.scss';
+import ColourCircle from "@/components/building-calendar/modules/colour-circle/colour-circle";
 
 export interface CalendarResourceFilterOption {
     value: string;
@@ -8,6 +9,7 @@ export interface CalendarResourceFilterOption {
 }
 
 interface CalendarResourceFilterProps {
+    hidden: boolean;
     resourceOptions: CalendarResourceFilterOption[];
     enabledResources: Set<string>;
     onToggle: (resourceId: string) => void;
@@ -18,10 +20,14 @@ const CalendarResourceFilter: FC<CalendarResourceFilterProps> = ({
                                                                      resourceOptions,
                                                                      enabledResources,
                                                                      onToggle,
-                                                                     onToggleAll
+                                                                     onToggleAll,
+                                                                     hidden
                                                                  }) => {
+
+
     return (
-        <div className={styles.resourceToggleContainer}>
+        <div className={`${styles.resourceToggleContainer} ${hidden ? styles.hidden : ''}`}
+        >
             <div className={styles.toggleAllContainer}>
                 <button
                     onClick={onToggleAll}
@@ -44,10 +50,7 @@ const CalendarResourceFilter: FC<CalendarResourceFilterProps> = ({
                         className={styles.resourceLabel}
                     >
                         {resource.label}
-                        <span
-                            className={styles.resourceColorIndicator}
-                            style={{backgroundColor: resource.color}}
-                        />
+                       <ColourCircle resourceId={+resource.value} />
                     </label>
                 </div>
             ))}

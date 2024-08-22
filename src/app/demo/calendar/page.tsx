@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { DateTime } from "luxon";
 import CalendarWrapper from '@/components/building-calendar/CalendarWrapper';
 import { fetchBuildingSchedule, fetchFreeTimeSlots } from "@/service/api/api-utils";
+import NotFound from "next/dist/client/components/not-found-error";
 
 interface CalendarPageProps {
     searchParams: { building_id?: string };
@@ -38,7 +39,7 @@ const CalendarPage = async ({ searchParams }: CalendarPageProps) => {
         );
     } catch (error) {
         console.error('Error fetching initial data:', error);
-        return <div>Error loading calendar data. Please try again later.</div>;
+        return NotFound();
     }
 };
 

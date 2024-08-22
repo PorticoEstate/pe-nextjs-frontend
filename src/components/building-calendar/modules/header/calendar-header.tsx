@@ -4,7 +4,7 @@ import {DateTime} from "luxon";
 import styles from './calendar-header.module.scss'
 import CalendarDatePicker from "@/components/building-calendar/modules/header/calendar-date-picker";
 import {Button} from "@digdir/designsystemet-react";
-import {ArrowLeftIcon, ArrowRightIcon, PlusCircleIcon} from "@navikt/aksel-icons";
+import {ArrowLeftIcon, ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon, PlusCircleIcon} from "@navikt/aksel-icons";
 import ButtonGroup from "@/components/button-group/button-group";
 
 // const CalendarHeader = () => ({
@@ -81,22 +81,20 @@ const CalendarHeader: FC<CalendarHeaderProps> = (props) => {
             {/*<IconButton color="primary" variant="outlined" size="medium" aria-label="prev" onClick={() => customButtons.prevButton.click()} component="span">*/}
             {/*    {'<'}*/}
             {/*</IconButton>*/}
-            <Button  size={'sm'} icon={true} color='second' variant='secondary' style={{borderRadius: "50%"}} onClick={() => customButtons.prevButton.click()}
+            <Button  size={'sm'} icon={true} variant='tertiary' style={{borderRadius: "50%"}} onClick={() => customButtons.prevButton.click()}
                     aria-label='Tertiary med ikon'>
-                <ArrowLeftIcon fontSize='1.5rem'/>
+                <ChevronLeftIcon fontSize='2.25rem'/>
             </Button>
             <CalendarDatePicker currentDate={currentDate} view={c.getApi().view.type}
-                                onDateChange={(v) => console.log(v)}/>
+                                onDateChange={(v) => calendarApi.gotoDate(v)}/>
 
-            <Button icon={true} size={'sm'} color='second' style={{borderRadius: "50%"}} variant='secondary' onClick={() => customButtons.nextButton.click()}
+            <Button icon={true} size={'sm'} variant='tertiary' style={{borderRadius: "50%"}}  onClick={() => customButtons.nextButton.click()}
                     aria-label='Tertiary med ikon'>
-                <ArrowRightIcon fontSize='1.5rem'/>
+                <ChevronRightIcon fontSize='2.25rem'/>
             </Button>
 
 
             {/*<span>{DateTime.fromJSDate(currentDate).toFormat('MMMM yyyy')}</span>*/}
-
-            <button onClick={() => customButtons.list.click()}>List</button>
         </div>
     );
 };

@@ -7,6 +7,10 @@
   grid-column: 1;
   grid-row-start: 2;
   grid-row-end: 4;
+  &.hidden {
+    //border: 5px;
+    display: none;
+  }
 }
 
 .toggleAllContainer {
@@ -54,9 +58,3 @@
   flex-grow: 1;
 }
 
-.resourceColorIndicator {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-left: 10px;
-}
