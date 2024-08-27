@@ -49,12 +49,12 @@ export interface IEventDate {
 }
 
 
-export interface IBuilding {
-    name: string
-    type: 'lokale' | 'anlegg' | string;
-    id: number
-    menuaction: 'bookingfrontend.uiresource.show'
-}
+// export interface IBuilding {
+//     name: string
+//     type: 'lokale' | 'anlegg' | string;
+//     id: number
+//     menuaction: 'bookingfrontend.uiresource.show'
+// }
 
 
 

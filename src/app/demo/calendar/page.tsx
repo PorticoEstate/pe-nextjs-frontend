@@ -5,6 +5,7 @@ import { DateTime } from "luxon";
 import CalendarWrapper from '@/components/building-calendar/CalendarWrapper';
 import { fetchBuildingSchedule, fetchFreeTimeSlots } from "@/service/api/api-utils";
 import NotFound from "next/dist/client/components/not-found-error";
+import {fetchBuilding} from "@/service/api/building";
 
 interface CalendarPageProps {
     searchParams: { building_id?: string };
@@ -23,18 +24,20 @@ const CalendarPage = async ({ searchParams }: CalendarPageProps) => {
     ];
 
     try {
-        const [initialSchedule, initialFreeTime] = await Promise.all([
+        const [initialSchedule, initialFreeTime, building] = await Promise.all([
             fetchBuildingSchedule(buildingId, weeksToFetch),
-            fetchFreeTimeSlots(buildingId)
+            fetchFreeTimeSlots(buildingId),
+            fetchBuilding(buildingId)
         ]);
-
         return (
             <CalendarWrapper
+                initialDate={initialDate.toJSDate()}
                 initialSchedule={initialSchedule.schedule || []}
                 initialFreeTime={initialFreeTime}
                 buildingId={buildingId}
                 resources={initialSchedule.resources}
                 seasons={initialSchedule.seasons}
+                building={building}
             />
         );
     } catch (error) {

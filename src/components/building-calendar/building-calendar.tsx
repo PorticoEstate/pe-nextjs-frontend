@@ -13,9 +13,9 @@ import {FCallEventConverter} from "@/components/building-calendar/util/event-con
 import CalendarResourceFilter, {
     CalendarResourceFilterOption
 } from "@/components/building-calendar/modules/calender-resource-filter";
-import EventContent from "@/components/building-calendar/modules/event/event-content";
+import EventContent from "@/components/building-calendar/modules/event/content/event-content";
 import CalendarHeader from "@/components/building-calendar/modules/header/calendar-header";
-import EventPopper from "@/components/building-calendar/modules/event/event-popper";
+import EventPopper from "@/components/building-calendar/modules/event/popper/event-popper";
 import CalendarInnerHeader from "@/components/building-calendar/modules/header/calendar-inner-header";
 import {usePopperData} from "@/service/api/event-info";
 import {
@@ -25,20 +25,25 @@ import {
     FCEventContentArg
 } from "@/components/building-calendar/building-calendar.types";
 import CalendarProvider from "@/components/building-calendar/calendar-context";
+import EventContentTemp from "@/components/building-calendar/modules/event/content/event-content-temp";
+import {IBuilding} from "@/service/types/Building";
 
 interface BuildingCalendarProps {
     events: IEvent[];
     resources: Record<string, IBuildingResource>;
     onDateChange: Dispatch<DatesSetArg>
-    seasons: Season[];  // Add this line
+    seasons: Season[];
+    building: IBuilding;
+    initialDate: DateTime;
 }
 
 Settings.defaultLocale = "nb";
 
 
 const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
+
     const {events} = props;
-    const [currentDate, setCurrentDate] = useState<DateTime>(DateTime.now());
+    const [currentDate, setCurrentDate] = useState<DateTime>(props.initialDate);
     const [calendarEvents, setCalendarEvents] = useState<FCallEvent[]>([]);
     const colours = useColours();
     const [slotMinTime, setSlotMinTime] = useState('00:00:00');
@@ -69,16 +74,37 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
 
     }, [view, lastCalendarView]);
 
+    const resourceOptions = useMemo<CalendarResourceFilterOption[]>(() => {
+        return Object.values(props.resources).map((resource, index) => ({
+            value: resource.id.toString(),
+            label: resource.name,
+            color: colours?.[index % colours.length]
+        }));
+    }, [props.resources, colours]);
 
+    const [enabledResources, setEnabledResources] = useState<Set<string>>(
+        new Set(resourceOptions.map(option => option.value))
+    );
     const setResourcesHidden = (v) => {
         if (!v) {
             setResourcesContainerRendered(true);
         }
         setSResourcesHidden(v)
     }
+    const handleDateClick = (arg: { date: Date; dateStr: string; allDay: boolean; }) => {
+        if (view === 'dayGridMonth') {
+            const clickedDate = DateTime.fromJSDate(arg.date);
+            setCurrentDate(clickedDate);
+            setView('timeGridWeek');
+            calendarRef.current?.getApi().gotoDate(clickedDate.toJSDate());
+        }
+    };
 
     const handleDateSelect = useCallback((selectInfo: DateSelectArg) => {
-        const resource = Object.values(props.resources)[0]; // Default to first resource
+        if (selectInfo.view.type === 'dayGridMonth') {
+            return;
+        }
+        // console.log(enabledResources, props.resources);
         const title = 'New Application';
         const newEvent: FCallTempEvent = {
             id: `temp-${Date.now()}`,
@@ -89,13 +115,12 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
             editable: true,
             extendedProps: {
                 type: 'temporary',
-                resources: [resource.id.toString()],
-                colours: [colours?.[0] || '#000000'],
+                resources: [...enabledResources].map(a => props.resources[a]),
             },
         };
         setTempEvents(prev => ({...prev, [newEvent.id]: newEvent}));
         selectInfo.view.calendar.unselect(); // Clear selection
-    }, [props.resources, colours]);
+    }, [props.resources, colours, enabledResources]);
 
 
     const handleEventClick = useCallback((clickInfo: EventClickArg) => {
@@ -154,7 +179,10 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
                     start: date.toFormat("yyyy-MM-dd'T00:00:00'"),
                     end: date.toFormat(`yyyy-MM-dd'T${season.from_}'`),
                     display: 'background',
-                    classNames: styles.closedHours
+                    classNames: styles.closedHours,
+                    extendedProps: {
+                        type: 'background'
+                    }
                 });
 
                 // Add background event for time after closing
@@ -162,7 +190,10 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
                     start: date.toFormat(`yyyy-MM-dd'T${season.to_}'`),
                     end: date.plus({days: 1}).toFormat("yyyy-MM-dd'T00:00:00'"),
                     display: 'background',
-                    classNames: styles.closedHours
+                    classNames: styles.closedHours,
+                    extendedProps: {
+                        type: 'background'
+                    }
                 });
             }
         }
@@ -176,17 +207,7 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
         }, {})
     }, [props.resources])
 
-    const resourceOptions = useMemo<CalendarResourceFilterOption[]>(() => {
-        return Object.values(props.resources).map((resource, index) => ({
-            value: resource.id.toString(),
-            label: resource.name,
-            color: colours?.[index % colours.length]
-        }));
-    }, [props.resources, colours]);
 
-    const [enabledResources, setEnabledResources] = useState<Set<string>>(
-        new Set(resourceOptions.map(option => option.value))
-    );
     const handleEventResize = useCallback((resizeInfo: EventResizeDoneArg) => {
         if (resizeInfo.event.extendedProps?.type === 'temporary') {
             setTempEvents(prev => ({
@@ -222,7 +243,8 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
         }
         const filteredEvents = events
             .map((e) => FCallEventConverter(e, colours, resourceToIds, enabledResources)!)
-        .filter(e => e);
+            .filter(e => e);
+        // console.log(events, filteredEvents)
         setCalendarEvents(filteredEvents);
     }, [events, colours, resourceToIds, enabledResources]);
 
@@ -250,19 +272,27 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
         }
     };
 
-    // const handleBeforeTransition = () => {
-    //     console.log('Before transition starts');
-    //     Perform an action before the transition
-    // };
-
     const handleAfterTransition = () => {
-        console.log('After transition ends');
         if (resourcesHidden) {
             setResourcesContainerRendered(false);
         }
     };
+
+
+    function renderEventContent(eventInfo: FCEventContentArg<FCallEvent | FCallTempEvent>) {
+        const type = eventInfo.event.extendedProps.type;
+        if(type === 'background') {
+            return null;
+        }
+        if(type === 'temporary') {
+            return <EventContentTemp eventInfo={eventInfo as FCEventContentArg<FCallTempEvent>}/>
+        }
+        return <EventContent eventInfo={eventInfo as FCEventContentArg<FCallEvent>}
+                             popperInfo={eventInfos?.data?.[selectedEvent?.extendedProps.source.type]?.[selectedEvent?.id]}
+        />
+    }
     return (
-        <CalendarProvider resourceToIds={resourceToIds}>
+        <CalendarProvider resourceToIds={resourceToIds} resources={props.resources} tempEvents={tempEvents} setTempEvents={setTempEvents}>
             <div className={`${styles.calendar} ${resourcesHidden ? styles.closed : ''} `}
                 // onTransitionStart={handleBeforeTransition}
                  onTransitionEnd={handleAfterTransition}>
@@ -277,7 +307,7 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
                 <CalendarInnerHeader view={view} resourcesHidden={resourcesHidden}
                                      setResourcesHidden={setResourcesHidden}
                                      calendarRef={calendarRef} setView={(v) => setView(v)}
-                                     setLastCalendarView={() => setView(lastCalendarView)}/>
+                                     setLastCalendarView={() => setView(lastCalendarView)} building={props.building}/>
                 <FullCalendar
                     ref={calendarRef}
                     plugins={[interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin]}
@@ -292,8 +322,7 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
                     datesSet={(dateInfo) => {
                         props.onDateChange(dateInfo);
                     }}
-                    eventContent={(eventInfo: FCEventContentArg<FCallEvent>) => <EventContent eventInfo={eventInfo}
-                                                                                              infoData={eventInfos?.data?.[eventInfo.event.extendedProps?.source?.type]?.[eventInfo.event.id]}/>}
+                    eventContent={(eventInfo: FCEventContentArg<FCallEvent | FCallTempEvent>) => renderEventContent(eventInfo)}
                     views={{
                         timeGrid: {
                             slotLabelFormat: {
@@ -328,10 +357,13 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
                     weekText="Uke "
                     locale={DateTime.local().locale}
                     selectable={true}
+                    height={'auto'}
                     eventMaxStack={4}
                     select={handleDateSelect}
+                    dateClick={handleDateClick}
                     events={[...calendarEvents, ...tempEventArr, ...renderBackgroundEvents()]}
                     // editable={true}
+                    selectOverlap={(stillEvent, movingEvent) => stillEvent?.extendedProps?.type !=='event'}
                     eventResize={handleEventResize}
                     eventDrop={handleEventResize}
                     initialDate={currentDate.toJSDate()}
@@ -339,7 +371,6 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
                 />
 
                 <EventPopper
-                    popperInfo={eventInfos?.data?.[selectedEvent?.extendedProps.source.type]?.[selectedEvent?.id]}
                     event={selectedEvent}
                     placement={
                         popperPlacement
@@ -348,6 +379,7 @@ const BuildingCalendar: FC<BuildingCalendarProps> = (props) => {
                     setSelectedEvent(null);
                     setPopperAnchorEl(null);
                 }}/>
+
             </div>
         </CalendarProvider>
     );

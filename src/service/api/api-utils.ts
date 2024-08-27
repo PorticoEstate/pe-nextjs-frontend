@@ -4,11 +4,11 @@ import {phpGWLink} from "@/service/util";
 const BOOKING_MONTH_HORIZON = 2;
 
 
-export async function fetchBuildingSchedule(building_id: number, dates_csv: string[], instance?: string) {
+export async function fetchBuildingSchedule(building_id: number, dates: string[], instance?: string) {
     const url = phpGWLink('bookingfrontend/', {
         menuaction: 'bookingfrontend.uibooking.building_schedule_pe',
         building_id,
-        dates_csv,
+        dates: dates,
     }, true, instance);
 
     const response = await fetch(url);

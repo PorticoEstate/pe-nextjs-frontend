@@ -1,3 +1,6 @@
+@import "../../../styles/colors";
+
+
 .resourceToggleContainer {
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -25,22 +28,25 @@
 .toggleAllButton {
   width: 100%;
   padding: 5px;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #e0e0e0;
-  }
+  //background-color: #f0f0f0;
+  //border: 1px solid #ccc;
+  //border-radius: 4px;
+  //cursor: pointer;
+  //
+  //&:hover {
+  //  background-color: #e0e0e0;
+  //}
 }
 
 .resourceItem {
+  user-select: none;
   display: flex;
   align-items: center;
   padding: 10px;
   border-bottom: 1px solid #eee;
-
+  &.active {
+    background-color: $purple-24;
+  }
   &:last-child {
     border-bottom: none;
   }
@@ -48,6 +54,14 @@
 
 .resourceCheckbox {
   margin-right: 10px;
+  display: flex;
+  flex-grow: 1;
+  >label {
+    flex-grow: 1;
+    >span {
+      flex-grow: 1;
+    }
+  }
 }
 
 .resourceLabel {

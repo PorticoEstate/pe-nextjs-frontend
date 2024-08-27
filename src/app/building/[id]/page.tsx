@@ -7,7 +7,6 @@ interface BuildingShowProps {
 }
 
 const BuildingShow: FC<BuildingShowProps> = (props) => {
-    console.log(props);
     return (
         <div>{props.params.id}</div>
     );

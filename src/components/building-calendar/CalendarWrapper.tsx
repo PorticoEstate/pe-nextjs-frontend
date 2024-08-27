@@ -8,21 +8,26 @@ import {fetchBuildingSchedule, fetchFreeTimeSlots} from "@/service/api/api-utils
 import {IBuildingResource, IEvent, Season} from "@/service/pecalendar.types";
 import {DatesSetArg} from "@fullcalendar/core";
 import {Modal, Spinner} from '@digdir/designsystemet-react'
+import {IBuilding} from "@/service/types/Building";
 
 interface CalendarWrapperProps {
     initialSchedule: IEvent[];
     initialFreeTime: any; // Replace 'any' with the correct type
     buildingId: number;
     resources: Record<string, IBuildingResource>;
-    seasons: Season[]
+    seasons: Season[];
+    building: IBuilding;
+    initialDate: Date;
 }
 
 const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
+                                                             initialDate,
                                                              initialSchedule,
                                                              initialFreeTime,
                                                              buildingId,
                                                              resources,
-                                                             seasons
+                                                             seasons,
+                                                             building
                                                          }) => {
     const [freeTime, setFreeTime] = useState(initialFreeTime);
     const [isLoading, setIsLoading] = useState(false);
@@ -44,6 +49,7 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
         try {
             const firstDay = start.startOf('week');
             const lastDay = (end || DateTime.now()).endOf('week');
+
 
             // Create an interval from start to end
             const dateInterval = Interval.fromDateTimes(firstDay, lastDay);
@@ -76,18 +82,12 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
     }, [buildingId]);
 
 
-
-
-
-
-
-
     const handleDateChange = (newDate: DatesSetArg) => {
         fetchData(DateTime.fromJSDate(newDate.start), DateTime.fromJSDate(newDate.end))
-            // .then(([newSchedule, newFreeTime]) => {
-            //     setSchedule(prioritizeEvents(newSchedule.schedule || []));
-            //     setFreeTime(newFreeTime);
-            // });
+        // .then(([newSchedule, newFreeTime]) => {
+        //     setSchedule(prioritizeEvents(newSchedule.schedule || []));
+        //     setFreeTime(newFreeTime);
+        // });
     };
     return (
         <div>
@@ -106,10 +106,12 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({
                 </div>
             }
             <BuildingCalendar
+                initialDate={DateTime.fromJSDate(initialDate)}
                 events={schedule}
                 onDateChange={handleDateChange}
                 resources={resources}
                 seasons={seasons}
+                building={building}
             />
         </div>
     );

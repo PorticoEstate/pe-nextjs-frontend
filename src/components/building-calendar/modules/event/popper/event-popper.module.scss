@@ -1,4 +1,4 @@
-@import "../../../../styles/colors";
+@import "../../../../../styles/colors";
 
 .eventPopper {
   background-color: $grey-24;
@@ -48,9 +48,9 @@
   gap: 0.25rem;
   .resourceItem {
     width: max-content;
-    padding: 0.25rem 0.75rem;
+    //padding: 0.25rem 0.75rem;
     border-radius: 5rem;
-    border: 1px solid $black-80;
+    //border: 1px solid $black-80;
 
     &.gray {
       border-color: $grey;

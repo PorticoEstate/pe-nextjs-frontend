@@ -41,7 +41,7 @@ export interface FilteredEventInfo {
     info_user_can_delete_events: number;
 }
 
-
+type EventInfoUnion = FilteredEventInfo | unknown | unknown;
 interface PopperData {
     event: Record<string, FilteredEventInfo>;
     allocation: unknown;
@@ -81,7 +81,7 @@ export const usePopperData = (
                 menuaction: 'bookingfrontend.uiallocation.info_json',
                 ids: uncachedAllocationIds.map(id => id),
             }, true)).then(d => Object.values(d.data.allocations).map((e) => ({
-                user_can_delete_allocations: d.data.user_can_delete_allocations, ...e,
+                info_user_can_delete_allocations: d.data.user_can_delete_allocations, ...e,
                 type: 'allocation'
             }))) : undefined;
 
@@ -91,7 +91,7 @@ export const usePopperData = (
                 menuaction: 'bookingfrontend.uibooking.info_json',
                 ids: uncachedBookingIds.map(id => id),
             }, true)).then(d => Object.values(d.data.bookings).map((e) => ({
-                user_can_delete_bookings: d.data.user_can_delete_bookings, ...e,
+                info_user_can_delete_bookings: d.data.user_can_delete_bookings, ...e,
                 type: 'booking'
             }))) : undefined;
 
@@ -191,3 +191,55 @@ export const useBookingPopperData = (booking_id: (string | number)) => {
     })
     return query;
 }
+
+export const usePopperGlobalInfo = (type: 'event' | 'allocation' | 'booking', id: string | number) => {
+    return useQuery({
+        queryKey: [`${type}Info`, id.toString()],
+        queryFn: async (): Promise<EventInfoUnion> => {
+            let url: string;
+            let dataKey: string;
+            let permissionKey: string;
+
+            switch (type) {
+                case 'event':
+                    url = phpGWLink('bookingfrontend/', {
+                        menuaction: 'bookingfrontend.uievent.info_json',
+                        id: id,
+                    }, true);
+                    dataKey = 'events';
+                    permissionKey = 'info_user_can_delete_events';
+                    break;
+                case 'allocation':
+                    url = phpGWLink('bookingfrontend/', {
+                        menuaction: 'bookingfrontend.uiallocation.info_json',
+                        id: id,
+                    }, true);
+                    dataKey = 'allocations';
+                    permissionKey = 'user_can_delete_allocations';
+                    break;
+                case 'booking':
+                    url = phpGWLink('bookingfrontend/', {
+                        menuaction: 'bookingfrontend.uibooking.info_json',
+                        id: id,
+                    }, true);
+                    dataKey = 'bookings';
+                    permissionKey = 'user_can_delete_bookings';
+                    break;
+                default:
+                    throw new Error(`Unsupported event type: ${type}`);
+            }
+
+            const response = await axios.get(url);
+            const data = response.data[dataKey][id];
+            const permission = response.data[permissionKey];
+
+            return {
+                ...data,
+                [permissionKey]: permission,
+                type: type
+            } as EventInfoUnion;
+        },
+    });
+};
+
+

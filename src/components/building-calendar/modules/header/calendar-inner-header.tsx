@@ -2,6 +2,7 @@ import React, {Dispatch, FC} from 'react';
 import {Button} from "@digdir/designsystemet-react";
 import {ChevronLeftFirstIcon, ChevronRightLastIcon} from "@navikt/aksel-icons";
 import styles from './calendar-inner-header.module.scss';
+import {IBuilding} from "@/service/types/Building";
 
 interface CalendarInnerHeaderProps {
     resourcesHidden: boolean
@@ -9,6 +10,7 @@ interface CalendarInnerHeaderProps {
     setView: Dispatch<string>;
     setLastCalendarView: Dispatch<void>;
     view: string;
+    building: IBuilding;
 }
 
 const CalendarInnerHeader: FC<CalendarInnerHeaderProps> = (props) => {
@@ -24,7 +26,7 @@ const CalendarInnerHeader: FC<CalendarInnerHeaderProps> = (props) => {
                 <ChevronLeftFirstIcon
                     className={`${styles.expandCollapseIcon} ${resourcesHidden ? styles.closed : styles.open}`}
                     fontSize='2.25rem'/>
-                Byggnavn 1
+                {props.building.name}
 
             </Button>
             <div style={{display: 'flex', gap: '1rem'}}>

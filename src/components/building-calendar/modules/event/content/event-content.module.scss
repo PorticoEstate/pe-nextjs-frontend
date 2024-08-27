@@ -1,4 +1,4 @@
-@import "../../../../styles/colors";
+@import "../../../../../styles/colors";
 
 .event {
   color: $black;
@@ -20,7 +20,12 @@
 
   &.longEvent {
     gap: 0.5rem
+  }
 
+  .participantLimit {
+    display: flex;
+    gap: 0.5em;
+    align-items: center
   }
 
   .colorCircles {
@@ -49,7 +54,7 @@
     display: inline-block;
     max-width: 100%; /* Ensure the span does not exceed its container */
     white-space: nowrap; /* Prevent text wrapping */
-    //overflow: hidden; /* Hide overflowing text */
+    overflow: hidden; /* Hide overflowing text */
     text-overflow: ellipsis; /* Add the ellipsis */
     vertical-align: middle; /* Align the text vertically */
     //flex-shrink: 1; /* Allow the text to shrink if necessary */
@@ -59,7 +64,7 @@
   }
 
 
-  .resourceIcons{
+  .resourceIcons {
     display: flex;
     gap: 0.5em;
     align-items: center;
