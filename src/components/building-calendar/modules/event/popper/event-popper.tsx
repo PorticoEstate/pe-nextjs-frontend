@@ -27,8 +27,7 @@ const EventPopper: FC<EventPopperProps> = ({event, anchor, onClose, placement, p
                     placement={placement}
                     style={{zIndex: 100}}>
                 {event.extendedProps.type === 'temporary' &&
-                    <TempEventPopperContent event={event as FCallTempEvent} onClose={onClose}
-                                            onResourceToggle={(v) => console.log(v)}/> ||
+                    <TempEventPopperContent event={event as FCallTempEvent} onClose={onClose}/> ||
                     <EventPopperContent event={event as FCallEvent} onClose={onClose}/>}
 
             </Popper>
