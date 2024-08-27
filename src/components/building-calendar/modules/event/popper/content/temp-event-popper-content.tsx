@@ -20,7 +20,6 @@ const TempEventPopperContent: FC<TempEventPopperProps> = (props) => {
     const event = tempEvents[props.event.id];
     const onResourceToggle = (resourceId: number) => {
         const enabled = event.extendedProps.resources.some(res => res.id == resourceId);
-        console.log(resourceId, enabled, event);
 
         if (enabled) {
             setTempEvents(tempEvents => {
