@@ -2,6 +2,7 @@ import React, {FC} from 'react';
 import styles from './calender-resource-filter.module.scss';
 import ColourCircle from "@/components/building-calendar/modules/colour-circle/colour-circle";
 import {Checkbox, Button} from "@digdir/designsystemet-react";
+import {useTempEvents} from "@/components/building-calendar/calendar-context";
 
 export interface CalendarResourceFilterOption {
     value: string;
@@ -24,7 +25,7 @@ const CalendarResourceFilter: FC<CalendarResourceFilterProps> = ({
                                                                      onToggleAll,
                                                                      hidden
                                                                  }) => {
-
+    const {tempEvents} = useTempEvents();
 
     return (
         <div className={`${styles.resourceToggleContainer} ${hidden ? styles.hidden : ''}`}
@@ -46,8 +47,7 @@ const CalendarResourceFilter: FC<CalendarResourceFilterProps> = ({
                         checked={enabledResources.has(resource.value)}
                         onChange={() => onToggle(resource.value)}
                         className={styles.resourceCheckbox}
-
-
+                        disabled={Object.values(tempEvents).length > 1}
                     >
                         <label
                             htmlFor={`resource-${resource.value}`}

@@ -18,6 +18,18 @@ const TempEventPopperContent: FC<TempEventPopperProps> = (props) => {
     const {tempEvents, setTempEvents} = useTempEvents();
 
     const event = tempEvents[props.event.id];
+
+    if(!event) {
+        return ;
+    }
+    const removeTempEvent = () => {
+        setTempEvents(tempEvents => {
+            const temp = {...tempEvents};
+
+            delete temp[props.event.id]
+            return temp;
+        })
+    }
     const onResourceToggle = (resourceId: number) => {
         const enabled = event.extendedProps.resources.some(res => res.id == resourceId);
 
@@ -57,6 +69,7 @@ const TempEventPopperContent: FC<TempEventPopperProps> = (props) => {
                                 id={`resource-${resource.id}`}
                                 checked={event.extendedProps.resources.some(res => res.id == resource.id)}
                                 onChange={() => onResourceToggle(resource.id)}
+                                disabled={Object.values(tempEvents).length > 1}
                             />
                             <ColourCircle resourceId={resource.id} size={'medium'}/>
                             <span className={styles.resourceName}>{resource.name}</span>
@@ -66,6 +79,7 @@ const TempEventPopperContent: FC<TempEventPopperProps> = (props) => {
             </div>
             <div className={styles.eventPopperFooter}>
                 <Button onClick={props.onClose} variant="tertiary" className={'default'} size={'sm'}>Close</Button>
+                <Button onClick={removeTempEvent} variant="tertiary" className={'default'} color={"danger"} size={'sm'}>Remove</Button>
             </div>
         </div>
     );
